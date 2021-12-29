@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <termios.h>
 //#include "list.h"
 
 #define MAX_V 20
@@ -51,6 +52,7 @@ typedef struct
 
 typedef struct
 {
+    int fa;
     int id;
     int w;
 }Dnode;
@@ -67,6 +69,12 @@ typedef struct
     queue_node *rear;
 }Queue;
 
+typedef struct
+{
+    int path[MAX_V];
+    int index;
+}Path;
+
 void list_add(VertexNode *vnode, ArcNode *node);
 void list_del(VertexNode *vnode, char *name);
 
@@ -77,6 +85,7 @@ int Isempty(Queue *list);
  
 int CreatGraph(AdjList *list);
 int InitGraph(AdjList *list);
+int ChangePass(AdjList *list);
 int SaveGraph(AdjList *list);
 int SearchVertex(AdjList *list, char *name);
 int InsertVertex(AdjList *list);
