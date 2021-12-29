@@ -3,7 +3,9 @@
 void PrintNode(AdjList *list)
 {
     // printf("         name ")
-    for(int i = 0; i < list->info.vexnum; i++){
+    for(int i = 0; i < MAX_V; i++){
+        if(!strcmp(list->vertex[i].data.name, "0"))
+            continue;
         printf("name : %s\n", list->vertex[i].data.name);
         printf("info : %s\n", list->vertex[i].data.info);
         printf("coordinate : x-%d y-%d\n", list->vertex[i].data.x, list->vertex[i].data.y);
@@ -12,7 +14,9 @@ void PrintNode(AdjList *list)
 
 void PrintPath(AdjList *list)
 {
-    for(int i = 0; i < list->info.vexnum; i++){
+    for(int i = 0; i < MAX_V; i++){
+        if(!strcmp(list->vertex[i].data.name, "0"))
+            continue;
         for(ArcNode *p = list->vertex[i].firstarc; p; p = p->nextarc){
             printf("sta : %s\n", p->info.vex);
             printf("des : %s\n", p->info.adjvex);
@@ -29,8 +33,10 @@ int CreatGraph(AdjList *list)
     EdgeInfo edgeinfo;
     VertexData vertexdata;
     FILE *fp_node, *fp_edge, *fp_info;
+    for(int i = 0; i < MAX_V; i++)
+        strcpy(list->vertex[i].data.name, "0");
      
-    fp_info = fopen("info.txt", "r");
+    fp_info = fopen("../file/info.txt", "r");
     if(fp_info == NULL) {
         printf("open info.txt failed\n");
         return -1;
@@ -39,7 +45,7 @@ int CreatGraph(AdjList *list)
         return 1;
 
     printf("%d %d %s\n", list->info.vexnum, list->info.arcnum, list->info.password);
-    fp_node = fopen("node.txt", "r");
+    fp_node = fopen("../file/node.txt", "r");
     if(fp_node == NULL) {
         printf("open node.txt failed\n");
         return -1;
@@ -52,7 +58,7 @@ int CreatGraph(AdjList *list)
     }
     printf("%d\n", index);
 
-    fp_edge = fopen("edge.txt", "r");
+    fp_edge = fopen("../file/edge.txt", "r");
     if(fp_edge == NULL) {
         printf("open edge.txt failed\n");
         return -1;
@@ -61,9 +67,9 @@ int CreatGraph(AdjList *list)
         if(fread(&edgeinfo, sizeof(EdgeInfo), 1, fp_edge)){
             ArcNode *newNode = (ArcNode *) malloc (sizeof(ArcNode));
 	        newNode->info = edgeinfo;
-            for(int i = 0; i < list->info.vexnum; i++){
+            for(int i = 0; i < MAX_V; i++){
                 if(!strcmp(edgeinfo.vex, list->vertex[i].data.name)){
-                    list_add(list, newNode);
+                    list_add(&list->vertex[i], newNode);
                     break;
                 }
             }
@@ -85,37 +91,45 @@ int SaveGraph(AdjList *list)
 {
     FILE *fp_node, *fp_edge, *fp_info;
 
-    fp_info = fopen("info.txt", "r+");
+    fp_info = fopen("../file/info.txt", "w");
     if(fp_info == NULL) {
         printf("open info.txt failed\n");
         return -1;
     }
     fwrite(&list->info, sizeof(Info), 1, fp_info);
+    fclose(fp_info);
 
-    fp_node = fopen("node.txt", "r+");
+    fp_node = fopen("../file/node.txt", "w");
     if(fp_node == NULL) {
         printf("open node.txt failed\n");
         return -1;
     }
-    for(int i = 0; i < list->info.vexnum; i++)
+    for(int i = 0; i < MAX_V; i++){
+        if(!strcmp(list->vertex[i].data.name, "0"))
+            continue;
         fwrite(&list->vertex[i].data, sizeof(VertexData), 1, fp_node);
+    }
+    fclose(fp_node);
 
-    fp_edge = fopen("edge.txt", "r+");
+    fp_edge = fopen("../file/edge.txt", "w");
     if(fp_edge == NULL) {
         printf("open edge.txt failed\n");
         return -1;
     }
-    for(int i = 0; i < list->info.vexnum; i++){
+    for(int i = 0; i < MAX_V; i++){
+        if(!strcmp(list->vertex[i].data.name, "0"))
+            continue;
         for(ArcNode *p = list->vertex[i].firstarc; p; p = p->nextarc)
             fwrite(&p->info, sizeof(EdgeInfo), 1, fp_edge);
     }
-
+    fclose(fp_edge);
+    
     return 0;
 }
  
 int SearchVertex(AdjList *list, char *name)
 {
-    for(int i = 0; i < list->info.vexnum; i++) {
+    for(int i = 0; i < MAX_V; i++) {
         if(!strcmp(name, list->vertex[i].data.name)) {
             printf("name:%s\n", name);
             printf("info:%s\n", list->vertex[i].data.info);
@@ -140,8 +154,15 @@ int InsertVertex(AdjList *list)
     scanf("%s", node->data.info);
     printf("please enter coordinate of the new node:");
     scanf("%d %d", &node->data.x, &node->data.y);
-    list->vertex[list->info.vexnum++] = *node;    
+    for(int i = 0; i < MAX_V; i++){
+        if(!strcmp(list->vertex[i].data.name, "0")){
+            list->vertex[i] = *node;
+            break;
+        }   
+    } 
+    list->info.vexnum++;
 
+    printf("insert successful.\n");
     return 0;
 }
  
@@ -159,10 +180,12 @@ int ModifyVertex(AdjList *list)
         return 1;
     }
 
-    for(int i = 0; i < list->info.vexnum; i++)
-        if(!strcmp(name, list->vertex[i].data.name))
+    for(int i = 0; i < MAX_V; i++)
+        if(!strcmp(name, list->vertex[i].data.name)){
             node = &list->vertex[i];
-    
+            break;
+        }
+            
 
     while(1) {
         printf("[1]name\n");
@@ -180,9 +203,16 @@ int ModifyVertex(AdjList *list)
             strcpy(node->data.name, newname);
             for(ArcNode *p = node->firstarc; p; p = p->nextarc){
                 strcpy(p->info.vex, newname);
-               // for(int j = 0; j < )
-            }
-                
+                for(int j = 0; j < MAX_V; j++){
+                    if(!strcmp(p->info.adjvex, list->vertex[j].data.name)){
+                        for(ArcNode *q = list->vertex[j].firstarc; q; q = q->nextarc){
+                            if(!strcmp(q->info.adjvex, name)){
+                                strcpy(q->info.adjvex, newname);
+                            }
+                        }
+                    }
+                }
+            }      
             break;
         case 2:
             printf("enter info plz:");
@@ -224,16 +254,19 @@ int DeleteVertex(AdjList *list)
         printf("confirm delete(0-no, 1-yes):");
         scanf("%d", &confirm);
         if(confirm == 1){
-            for(int i = 0; i < list->info.vexnum; i++){
+            for(int i = 0; i < MAX_V; i++){
                 if(!strcmp(name, list->vertex[i].data.name)){
-                    for(ArcNode *p = list->vertex->firstarc; p; p = p->nextarc){
+                    for(ArcNode *p = list->vertex[i].firstarc; p; p = p->nextarc){
                         edge_num++;
-                        for(int j = 0; j < list->info.vexnum; j++){
-                            if(!strcmp(p->info.adjvex, list->vertex[j].data.name))
+                        for(int j = 0; j < MAX_V; j++){
+                            if(!strcmp(p->info.adjvex, list->vertex[j].data.name)){
                                 list_del(&list->vertex[j], name);
+                                break;
+                            }
                         }
+                        list_del(&list->vertex[i], p->info.adjvex);
                     }
-                    memset(&list->vertex[i], 0, sizeof(VertexNode));
+                    strcpy(list->vertex[i].data.name, "0");
                     break;
                 }
             }
@@ -272,18 +305,25 @@ int InsertEdge(AdjList *list)
     scanf("%s", info);
     strcpy(node->info.info, info);
 //   weight initialization
-    for(int i = 0; i < list->info.vexnum; i++)
-        if(!strcmp(sta, list->vertex[i].data.name)) 
+    printf("enter weight0 plz.:");
+    scanf("%d", &node->info.weight[0]);
+    for(int i = 0; i < MAX_V; i++)
+        if(!strcmp(sta, list->vertex[i].data.name)){
             list_add(&list->vertex[i], node);
+            break;
+        }
 
     ArcNode *node2 = (ArcNode *) malloc (sizeof(ArcNode));
     strcpy(node2->info.vex, des);
     strcpy(node2->info.adjvex, sta);
     strcpy(node2->info.info, info);
 //   weight initialization
-    for(int i = 0; i < list->info.vexnum; i++)
-        if(!strcmp(des, list->vertex[i].data.name)) 
+    node2->info.weight[0] = node->info.weight[0];
+    for(int i = 0; i < MAX_V; i++)
+        if(!strcmp(des, list->vertex[i].data.name)){
             list_add(&list->vertex[i], node2);
+            break;
+        }
 
     list->info.arcnum++;
     printf("insert successful.\n");
@@ -311,17 +351,19 @@ int ModifyEdge(AdjList *list)
         return 1;
     }
 
-    for(int i = 0; i < list->info.vexnum; i++){
+    for(int i = 0; i < MAX_V; i++){
         if(!strcmp(sta, list->vertex[i].data.name)){
             for(p = list->vertex[i].firstarc; p; p = p->nextarc){
-                if(!strcmp(des, p->info.adjvex))
+                if(!strcmp(des, p->info.adjvex)){
                     break;
+                }
             }
         }
         if(!strcmp(des, list->vertex[i].data.name)){
             for(q = list->vertex[i].firstarc; q; q = q->nextarc){
-                if(!strcmp(des, q->info.adjvex))
+                if(!strcmp(sta, q->info.adjvex)){
                     break;
+                }
             }
         }
     }
@@ -348,7 +390,7 @@ int ModifyEdge(AdjList *list)
                 printf("enter info plz.:\n");
                 printf("**\n");
                 scanf("%s", info);
-                printf("**\n");
+                printf("%s %s\n",p->info.info, q->info.info);
                 strcpy(p->info.info, info);
                 strcpy(q->info.info, info);
                 break;
@@ -388,19 +430,19 @@ int DeleteEdge(AdjList *list)
     char sta[30], des[30];
     printf("enter sta name plz:");
     scanf("%s", sta);
-    printf("enter des name plz:");
-    scanf("%s", des);
-
     if(SearchVertex(list, sta)){
         printf("sta not found.\n");
         return 1;
     }
+
+    printf("enter des name plz:");
+    scanf("%s", des);
     if(SearchVertex(list, des)){
         printf("des not found.\n");
         return 1;
     }
 
-    for(int i = 0; i < list->info.vexnum; i++){
+    for(int i = 0; i < MAX_V; i++){
         if(!strcmp(sta, list->vertex[i].data.name)){
             list_del(&list->vertex[i], des);
         }
@@ -414,10 +456,134 @@ int DeleteEdge(AdjList *list)
     return 0;
 }
  
-int Dijkstra()
+int Dijkstra(AdjList *list, int flag)
 {
-     
-} 
+    char sta[30], des[30];
+    int start, end;
+    int path[MAX_V];
+    int visited[MAX_V] = {0};
+    Dnode dist[MAX_V];
+    Queue *queue = InitQueue();
+
+    printf("enter sta name plz:");
+    scanf("%s", sta);
+    if(SearchVertex(list, sta)){
+        printf("sta not found.\n");
+        return 1;
+    }
+    printf("enter des name plz:");
+    scanf("%s", des);
+    if(SearchVertex(list, des)){
+        printf("des not found.\n");
+        return 1;
+    }
+
+    for(int i = 0; i <list->info.vexnum; i++){
+        if(!strcmp(sta, list->vertex[i].data.name)){
+            start = i;
+        }
+        if(!strcmp(des, list->vertex[i].data.name)){
+            end = i;
+        }
+    }
+    printf("%d %d\n", start, end);
+    for(int i = 0; i < list->info.vexnum; i++){
+        dist[i].id = i;
+        dist[i].w = 30000;
+        path[i] = -1;
+        visited[i] = 0;
+    }
+    dist[start].w = 0;
+    Push(queue, dist[start]);
+    while (!Isempty(queue))
+    {
+        Dnode cd = Pop(queue);
+        int u = cd.id;
+        printf("**%d %d\n", u, cd.w);
+        if(visited[u])
+            continue;
+        visited[u] = 1;
+        ArcNode *p = list->vertex[u].firstarc;
+
+        while(p)
+        {
+            int tempv;
+            for(int i = 0; i < list->info.vexnum; i++){
+                if(!strcmp(p->info.adjvex, list->vertex[i].data.name))
+                    tempv = i;
+            }
+            int tempw = p->info.weight[flag];
+
+            
+            for(int i = 0; i < list->info.vexnum; i++)
+                printf("%d ", dist[i].w);
+            if(!visited[tempv] && dist[tempv].w > dist[u].w+tempw){
+                dist[tempv].w = dist[u].w+tempw;
+                path[tempv] = u;
+                Push(queue, dist[tempv]);
+            }
+            for(int i = 0; i < list->info.vexnum; i++)
+                printf("%d ", dist[i].w);
+            printf("\n\n");
+            p = p->nextarc;
+        }
+        printf("---\n");
+    }
+    printf("****%d\n", dist[end].w);
+}
+
+Queue *InitQueue()
+{
+    Queue *q = (Queue *)malloc(sizeof(Queue));
+    queue_node *p = (queue_node *)malloc(sizeof(queue_node));
+    p->next = NULL;
+    q->front = q->rear = p;
+    return q;
+}
+
+void Push(Queue *list, Dnode node)
+{
+    queue_node *Qnode = (queue_node *)malloc(sizeof(queue_node));
+    Qnode->data = node;
+    Qnode->next = NULL;
+    if(Isempty(list)){
+        list->rear->next = Qnode;
+        list->rear = Qnode;
+    } else {
+        queue_node *q = list->front;
+        queue_node *p = list->front->next;
+        for(; p; q = p, p = p->next){
+            if(p->data.w > Qnode->data.w){
+                q->next = Qnode;
+                Qnode->next = p;
+                return ;
+            }
+        }
+        list->rear->next = Qnode;
+        list->rear = Qnode;
+    }
+}
+
+Dnode Pop(Queue *list)
+{
+    if(!Isempty(list)){
+        queue_node *p = list->front->next;
+        list->front->next = p->next;
+        Dnode re = p->data;
+        free(p);
+        if(list->front->next == NULL)
+            list->rear = list->front;
+        return re;
+    }
+}
+
+int Isempty(Queue *list)
+{
+    if(list->front == list->rear)
+        return 1;
+    else 
+        return 0;
+}
 
 void list_add(VertexNode *vnode, ArcNode *node)
 {
@@ -436,5 +602,19 @@ void list_add(VertexNode *vnode, ArcNode *node)
 
 void list_del(VertexNode *vnode, char *name)
 {
-    
+    ArcNode *q = NULL;
+    ArcNode *p = vnode->firstarc;
+    if(p->nextarc == NULL){
+        vnode->firstarc = NULL;
+    } else {
+        for(; p; q = p, p = p->nextarc){
+            if(!strcmp(p->info.adjvex, name)){
+                if(vnode->firstarc == p){
+                    vnode->firstarc = p->nextarc;
+                }else
+                    q->nextarc = p->nextarc;
+                free(p);
+            }
+        }
+    }
 }

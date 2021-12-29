@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-// #include "list.h"
+//#include "list.h"
 
 #define MAX_V 20
 
@@ -49,11 +49,34 @@ typedef struct
 //  GraphKind kind;
 }AdjList;
 
-void list_add(VertexNode *vnode, ArcNode *node);
+typedef struct
+{
+    int id;
+    int w;
+}Dnode;
 
+typedef struct node
+{
+    Dnode data;
+    struct node* next;
+}queue_node;
+
+typedef struct 
+{
+    queue_node *front;
+    queue_node *rear;
+}Queue;
+
+void list_add(VertexNode *vnode, ArcNode *node);
 void list_del(VertexNode *vnode, char *name);
+
+Queue *InitQueue();
+void Push(Queue *list, Dnode node);
+Dnode Pop(Queue *list);
+int Isempty(Queue *list);
  
 int CreatGraph(AdjList *list);
+int InitGraph(AdjList *list);
 int SaveGraph(AdjList *list);
 int SearchVertex(AdjList *list, char *name);
 int InsertVertex(AdjList *list);
@@ -62,6 +85,6 @@ int DeleteVertex(AdjList *list);
 int InsertEdge(AdjList *list);
 int ModifyEdge(AdjList *list);
 int DeleteEdge(AdjList *list);
-int Dijkstra();
+int Dijkstra(AdjList *list, int flag);
 void PrintNode(AdjList *list);
 void PrintPath(AdjList *list);
