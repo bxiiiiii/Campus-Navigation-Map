@@ -1,0 +1,1 @@
+/usr/bin/cc -rdynamic CMakeFiles/Demo.dir/src/main.c.o CMakeFiles/Demo.dir/src/UI.c.o CMakeFiles/Demo.dir/src/Operations.c.o -o Demo 

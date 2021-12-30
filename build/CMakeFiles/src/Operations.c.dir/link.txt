@@ -1,0 +1,1 @@
+/usr/bin/cc -rdynamic CMakeFiles/src/Operations.c.dir/src/UI.c.o CMakeFiles/src/Operations.c.dir/src/main.c.o -o src/Operations.c 

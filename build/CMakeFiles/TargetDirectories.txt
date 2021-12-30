@@ -1,0 +1,4 @@
+/home/bxiiiiii/progr/build/CMakeFiles/../bin/Demo.dir
+/home/bxiiiiii/progr/build/CMakeFiles/test.dir
+/home/bxiiiiii/progr/build/CMakeFiles/edit_cache.dir
+/home/bxiiiiii/progr/build/CMakeFiles/rebuild_cache.dir

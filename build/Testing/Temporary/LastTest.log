@@ -1,0 +1,19 @@
+Start testing: Dec 29 15:29 CST
+----------------------------------------------------------
+Unable to find executable: Demo
+1/1 Testing: test_run
+1/1 Test: test_run
+Command: "" "1" "1" "qq" "qqqq" "5" "2" "9"
+Directory: /home/bxiiiiii/progr/build
+"test_run" start time: 
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"test_run" end time: Dec 29 15:29 CST
+"test_run" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Dec 29 15:29 CST
