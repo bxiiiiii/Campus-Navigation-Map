@@ -7,6 +7,7 @@
 //#include "list.h"
 
 #define MAX_V 20
+#define MAX_G 10
 
 typedef struct 
 {
@@ -85,6 +86,7 @@ int Isempty(Queue *list);
  
 int CreatGraph(AdjList *list);
 int InitGraph(AdjList *list);
+int Login(AdjList *list);
 int ChangePass(AdjList *list);
 int SaveGraph(AdjList *list);
 int SearchVertex(AdjList *list, char *name);

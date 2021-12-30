@@ -2,25 +2,39 @@
  
 void PrintNode(AdjList *list)
 {
-    // printf("         name ")
+    system("clear");
+    if(list->info.vexnum == 0){
+        printf("暂无记录\n");
+        return ;
+    }
     for(int i = 0; i < MAX_V; i++){
         if(!strcmp(list->vertex[i].data.name, "0"))
             continue;
-        printf("name : %s\n", list->vertex[i].data.name);
-        printf("info : %s\n", list->vertex[i].data.info);
-        printf("coordinate : x-%d y-%d\n", list->vertex[i].data.x, list->vertex[i].data.y);
+        printf("地点 : %s\n", list->vertex[i].data.name);
+        printf("相关信息 : %s\n", list->vertex[i].data.info);
+        printf("坐标 : x-%d y-%d\n", list->vertex[i].data.x, list->vertex[i].data.y);
+	printf("--------------------------------------------------------------------\n");
     }
 }
 
 void PrintPath(AdjList *list)
 {
+    system("clear");
+    if(list->info.arcnum == 0){
+        printf("暂无记录\n");
+        return ;
+    }
     for(int i = 0; i < MAX_V; i++){
         if(!strcmp(list->vertex[i].data.name, "0"))
             continue;
         for(ArcNode *p = list->vertex[i].firstarc; p; p = p->nextarc){
-            printf("sta : %s\n", p->info.vex);
-            printf("des : %s\n", p->info.adjvex);
-            printf("info : %s\n", p->info.info);
+            printf("起点 : %s\n", p->info.vex);
+            printf("终点 : %s\n", p->info.adjvex);
+            printf("相关信息 : %s\n", p->info.info);
+	    printf("路径长度 : %d\n", p->info.weight[0]);
+	    printf("优美指数 : %d\n", p->info.weight[1]);
+	    printf("绿荫指数 : %d\n", p->info.weight[2]);
+	    printf("----------------------------------------------------------------\n");
         }
     }
 }
@@ -136,6 +150,7 @@ int Login(AdjList *list)
 	char ch;
 	int i= 0;
 	char password_buf1[20];
+    printf("请输入密码:");
     while(1){
         setbuf(stdin, NULL);
         tcsetattr(0,TCSANOW,&newt);
@@ -247,6 +262,7 @@ int ModifyVertex(AdjList *list)
     char name[30], newname[30];
     VertexNode *node = NULL;
 
+    system("clear");
     printf("请输入待修改地点的名称:");
     scanf("%s", name);
     if(SearchVertex(list, name)) {
@@ -317,6 +333,8 @@ int DeleteVertex(AdjList *list)
     int confirm;
     int edge_num = 0;
     char name[30];
+
+    system("clear");
     printf("请输入待删除的地点名称:");
     scanf("%s", name);
     if(SearchVertex(list, name)){
@@ -357,7 +375,10 @@ int DeleteVertex(AdjList *list)
  
 int InsertEdge(AdjList *list)
 {
+    int tem;
     char sta[30], des[30], info[100];
+
+    system("clear");
     printf("请输入起始地点:");
     scanf("%s", sta);
     if(SearchVertex(list, sta)){
@@ -381,10 +402,12 @@ int InsertEdge(AdjList *list)
 //   weight initialization
     printf("请输入路径长度:");
     scanf("%d", &node->info.weight[0]);
-    printf("请输入优美指数:");
-    scanf("%d", &node->info.weight[1]);
+    printf("请输入优美指数:");    
+    scanf("%d", &tem);
+    node->info.weight[1] = MAX_G - tem;
     printf("请输入绿荫指数:");
-    scanf("%d", &node->info.weight[2]);
+    scanf("%d", &tem);
+    node->info.weight[2] = MAX_G - tem;
     for(int i = 0; i < MAX_V; i++)
         if(!strcmp(sta, list->vertex[i].data.name)){
             list_add(&list->vertex[i], node);
@@ -417,6 +440,7 @@ int ModifyEdge(AdjList *list)
     ArcNode *p = NULL, *q = NULL;
     char sta[30], des[30], info[100];
 
+    system("clear");
     printf("请输入起始地点:");
     scanf("%s", sta);
     if(SearchVertex(list, sta)){
@@ -458,7 +482,7 @@ int ModifyEdge(AdjList *list)
         printf("[2]路径长度\n");
         printf("[3]优美指数\n");
         printf("[4]绿荫指数\n");
-        printf("[5]weight4\n");
+        //printf("[5]weight4\n");
         printf("[6]返回\n");
         printf("请输入待修改的内容:");
         scanf("%d", &choice);
@@ -476,22 +500,25 @@ int ModifyEdge(AdjList *list)
                 printf("请输入新的路径长度:\n");
                 scanf("%d", &weight);
                 p->info.weight[0] = weight;
+                q->info.weight[0] = weight;
                 break;
             case 3:
                 printf("请输入新的优美指数:\n");
                 scanf("%d", &weight);
-                p->info.weight[1] = weight;
+                p->info.weight[1] = MAX_G - weight;
+                q->info.weight[1] = MAX_G - weight;
                 break;
             case 4:
                 printf("请输入新的绿荫指数:\n");
                 scanf("%d", &weight);
-                p->info.weight[2] = weight;
+                p->info.weight[2] = MAX_G - weight;
+                q->info.weight[2] = MAX_G - weight;
                 break;
-            case 5:
-                printf("enter weight4 plz.\n");
-                scanf("%d", &weight);
-                p->info.weight[3] = weight;
-                break;
+            // case 5:
+            //     printf("enter weight4 plz.\n");
+            //     scanf("%d", &weight);
+            //     p->info.weight[3] = weight;
+            //     break;
             case 6:
                 return 0;
             default:
@@ -506,6 +533,7 @@ int ModifyEdge(AdjList *list)
 int DeleteEdge(AdjList *list)
 {
     char sta[30], des[30];
+    system("clear");
     printf("请输入起始地点:");
     scanf("%s", sta);
     if(SearchVertex(list, sta)){
@@ -536,6 +564,7 @@ int DeleteEdge(AdjList *list)
  
 int Dijkstra(AdjList *list, int flag)
 {
+    system("clear");
     char sta[30], des[30];
     int start, end;
     Path path_[MAX_V];
@@ -614,15 +643,15 @@ int Dijkstra(AdjList *list, int flag)
         }
         // printf("---\n");
     }
-    printf("起始地点:%s\n", sta);
-    printf("途径:");
+    printf("\t\t起始地点:%s\n", sta);
+    printf("\t\t    途径:\n");
     // for(int i = 0; i < list->info.vexnum; i++){
         for(int j = 1; j < path_[end].index; j++)
-            printf("%d ", path_[end].path[j]);
-        printf("终止地点:%s\n", des);
+            printf("\t\t\t %s\n", list->vertex[path_[end].path[j]].data.name);
+        printf("\t\t终止地点:%s\n", des);
     // }
         
-    printf("路径总长: %d\n", dist[end].w);
+    printf("\t\t路径总长: %d\n", dist[end].w);
 }
 
 Queue *InitQueue()
