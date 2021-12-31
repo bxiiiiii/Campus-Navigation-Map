@@ -7,14 +7,81 @@ void PrintNode(AdjList *list)
         printf("暂无记录\n");
         return ;
     }
-    for(int i = 0; i < MAX_V; i++){
-        if(!strcmp(list->vertex[i].data.name, "0"))
-            continue;
-        printf("地点 : %s\n", list->vertex[i].data.name);
-        printf("相关信息 : %s\n", list->vertex[i].data.info);
-        printf("坐标 : x-%d y-%d\n", list->vertex[i].data.x, list->vertex[i].data.y);
-	printf("--------------------------------------------------------------------\n");
+    int ice = 0;
+    int choice, x, y;
+    char name[30], info[100];
+    printf("\n\n\n\t\t\t[1]全部\n");
+    printf("\t\t\t[2]地点\n");
+    printf("\t\t\t[3]相关信息\n");
+    printf("\t\t\t[4]坐标\n");
+    printf("\t\t\t[5]返回\n");
+    printf("\t\t输入查询选项:");
+    scanf("%d", &choice);
+    switch (choice)
+    {
+    case 1:
+        for(int i = 0; i < MAX_V; i++){
+            if(!strcmp(list->vertex[i].data.name, "0"))
+                continue;
+            printf("地点 : %s\n", list->vertex[i].data.name);
+            printf("相关信息 : %s\n", list->vertex[i].data.info);
+            printf("坐标 : x-%d y-%d\n", list->vertex[i].data.x, list->vertex[i].data.y);
+            printf("--------------------------------------------------------------------\n");
+        }
+        break;
+    case 2:
+        printf("请输入地点的名称:");
+        scanf("%s", name);
+        for(int i = 0; i < MAX_V; i++) {
+            if(!strcmp(name, list->vertex[i].data.name)) {
+                printf("名称:%s\n", name);
+                printf("信息:%s\n", list->vertex[i].data.info);
+                printf("坐标:x-%d y-%d\n", list->vertex[i].data.x, list->vertex[i].data.y);
+                ice = 1;
+                break;
+            }
+        }
+        if(!ice)
+            printf("暂无记录\n");
+        break;
+    case 3:
+        printf("请输入有关信息:");
+        scanf("%s", info);
+        for(int i = 0; i < MAX_V; i++) {
+            if(!strcmp(info, list->vertex[i].data.info)) {
+                printf("名称:%s\n", list->vertex[i].data.name);
+                printf("信息:%s\n", list->vertex[i].data.info);
+                printf("坐标:x-%d y-%d\n", list->vertex[i].data.x, list->vertex[i].data.y);
+                printf("---------------------------------------------------------------\n");
+                ice = 1;
+            }
+        }
+        if(!ice)
+            printf("暂无记录\n");
+        break;
+    case 4:
+        printf("请输入地点的坐标（x y）:");
+        scanf("%d %d", &x, &y);
+        for(int i = 0; i < MAX_V; i++) {
+            if(list->vertex[i].data.x == x && list->vertex[i].data.y == y) {
+                printf("名称:%s\n", list->vertex[i].data.name);
+                printf("信息:%s\n", list->vertex[i].data.info);
+                printf("坐标:x-%d y-%d\n", list->vertex[i].data.x, list->vertex[i].data.y);
+                printf("---------------------------------------------------------------\n");
+                ice = 1;
+                break;
+            }
+        }
+        if(!ice)
+            printf("暂无记录\n");
+        break;
+    case 5:
+        return ;
+    default:
+        printf("请输入正确选项！\n");
+        break;
     }
+
 }
 
 void PrintPath(AdjList *list)
@@ -193,7 +260,7 @@ int ChangePass(AdjList *list)
             i++;
         }
 
-        printf("\t\t\t请再次输入密码:");
+        printf("\n\t\t\t请再次输入密码:");
         i = 0;
         while(1){
             setbuf(stdin, NULL);
@@ -208,10 +275,10 @@ int ChangePass(AdjList *list)
         }
         if(!strcmp(password_buf1, password_buf2)){
             strcpy(list->info.password, password_buf2);
-            printf("succ\n");
+            printf("successful.\n");
             break;
         } else {
-            printf("again\n");
+            printf("again.\n");
         }
     }while(1);
 }
@@ -650,8 +717,10 @@ int Dijkstra(AdjList *list, int flag)
             printf("\t\t\t %s\n", list->vertex[path_[end].path[j]].data.name);
         printf("\t\t终止地点:%s\n", des);
     // }
-        
-    printf("\t\t路径总长: %d\n", dist[end].w);
+    if(dist[end].w != 30000)
+        printf("\t\t路径总长: %d\n", dist[end].w);
+    else
+        printf("not exit.\n");
 }
 
 Queue *InitQueue()

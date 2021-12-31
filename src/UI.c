@@ -115,6 +115,7 @@ void user_UI(AdjList *list)
                 break;
             case 5:
                 Dijkstra(list, 2);
+                break;
             case 6:
                 return ;
             default:
