@@ -275,10 +275,10 @@ int ChangePass(AdjList *list)
         }
         if(!strcmp(password_buf1, password_buf2)){
             strcpy(list->info.password, password_buf2);
-            printf("successful.\n");
+            printf("\nsuccessful.\n");
             break;
         } else {
-            printf("again.\n");
+            printf("\nagain.\n");
         }
     }while(1);
 }
